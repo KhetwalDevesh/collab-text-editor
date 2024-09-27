@@ -1,28 +1,32 @@
-// import { Room } from "@/app/Room";
 "use client";
-import { CollaborativeEditor } from "@/components/CollaborativeEditor";
-import { Room } from "./Room";
+import { useSearchParams, useRouter } from "next/navigation";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function Home() {
-  const [roomId, setRoomId] = useState("");
+export default function EnterNamePage() {
+  const searchParams = useSearchParams();
   const router = useRouter();
+
+  // Get the roomId from the query parameters
+  const roomId = searchParams.get("roomId");
+  const [username, setUsername] = useState("");
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (roomId) {
-      // Navigate to the dynamic route based on roomId
-      console.log("roomId", JSON.stringify(roomId, null, 2));
-      router.push(`/enter-name?roomId=${roomId}`);
+    if (username && roomId) {
+      // Store the username in sessionStorage or localStorage
+      sessionStorage.setItem("username", username);
+
+      // Redirect to the room page with the roomId
+      router.push(`/${roomId}`);
     }
   };
+
   return (
-    <div className="flex bg-black z-50">
-      <h1>Right Panel</h1>
+    <div>
+      <h1>Enter Your Name</h1>
       <Box
         component="form"
         onSubmit={handleSubmit}
@@ -34,10 +38,10 @@ export default function Home() {
         }}
       >
         <TextField
-          label="Enter Room ID"
+          label="Enter Your Name"
           variant="outlined"
-          value={roomId}
-          onChange={(e) => setRoomId(e.target.value)}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           sx={{ width: 300 }}
         />
         <Button type="submit" variant="contained" color="primary">
