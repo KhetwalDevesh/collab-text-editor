@@ -10,13 +10,15 @@ const liveblocks = new Liveblocks({
   secret: process.env.LIVEBLOCKS_SECRET_KEY!,
 });
 
+let session;
+
 export async function POST(request: NextRequest) {
   // Get the current user's unique id from your database
   const userId = Math.floor(Math.random() * 10) % USER_INFO.length;
 
   // Create a session for the current user
   // userInfo is made available in Liveblocks presence hooks, e.g. useOthers
-  const session = liveblocks.prepareSession(`user-${userId}`, {
+  session = liveblocks.prepareSession(`user-${userId}`, {
     userInfo: USER_INFO[userId],
   });
   console.log("session", JSON.stringify(session, null, 2));
@@ -29,6 +31,8 @@ export async function POST(request: NextRequest) {
   console.log("status", JSON.stringify(status, null, 2));
   return new Response(body, { status });
 }
+
+console.log("session", JSON.stringify(session, null, 2));
 
 const USER_INFO = [
   {

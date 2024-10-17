@@ -2,14 +2,26 @@
 "use client";
 import { CollaborativeEditor } from "@/components/CollaborativeEditor";
 import { Room } from "./Room";
+import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { setGlobalState, useGlobalState } from "@/store";
+import { createNewRoom } from "./api/room";
+
+function useCreateRoom() {
+  return useQuery({
+    queryKey: ["create-room"],
+    queryFn: createNewRoom,
+  });
+}
 
 export default function Home() {
+  const { userId } = useGlobalState();
   const [roomId, setRoomId] = useState("");
+  const [loggedIn, setLoggedIn] = useState<boolean>(userId ? true : false);
   const router = useRouter();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -20,9 +32,44 @@ export default function Home() {
       router.push(`/enter-name?roomId=${roomId}`);
     }
   };
+  console.log("userId", JSON.stringify(userId, null, 2));
+  console.log("loggedIn", JSON.stringify(loggedIn, null, 2));
+  const startNewRoom = async () => {
+    console.log("clicked start new room");
+    try {
+      const response = await createNewRoom(); // Wait for the API response
+      console.log("response", JSON.stringify(response, null, 2));
+      setGlobalState({ currentRoomId: response.id });
+      router.push(response.id);
+    } catch (error) {
+      console.error("Error creating new room:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (userId) {
+      setLoggedIn(true);
+    }
+  }, [userId]);
+
   return (
-    <div className="flex bg-black z-50">
+    <div className="">
       <h1>Right Panel</h1>
+      {loggedIn ? (
+        <div className="border-2 flex justify-center">
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            sx={{ marginTop: "80px" }}
+            onClick={() => startNewRoom()}
+          >
+            Start a new Room
+          </Button>
+        </div>
+      ) : (
+        <>Not loggedIn</>
+      )}
       <Box
         component="form"
         onSubmit={handleSubmit}
@@ -38,7 +85,7 @@ export default function Home() {
           variant="outlined"
           value={roomId}
           onChange={(e) => setRoomId(e.target.value)}
-          sx={{ width: 300 }}
+          sx={{ width: 300, marginTop: "220px" }}
         />
         <Button type="submit" variant="contained" color="primary">
           Go to Room

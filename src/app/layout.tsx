@@ -1,5 +1,6 @@
 import "../globals.css";
 import { Providers } from "./Providers";
+import { Toaster } from "react-hot-toast";
 // import { Providers } from "./Providers";
 
 export const metadata = {
@@ -28,7 +29,10 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <Toaster position="top-center" reverseOrder={false} />
+        </Providers>
       </body>
     </html>
   );

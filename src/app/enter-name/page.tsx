@@ -3,23 +3,26 @@ import { useSearchParams, useRouter } from "next/navigation";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useGlobalState } from "@/store";
+import { addUserToRoom } from "../api/room";
 
 export default function EnterNamePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { userName, userId } = useGlobalState();
 
   // Get the roomId from the query parameters
   const roomId = searchParams.get("roomId");
-  const [username, setUsername] = useState("");
+  const [guestUsername, setGuestUsername] = useState("");
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (username && roomId) {
+    if (guestUsername && roomId) {
       // Store the username in sessionStorage or localStorage
-      sessionStorage.setItem("username", username);
-
       // Redirect to the room page with the roomId
+      console.log("handleSubmit called");
+      addUserToRoom(roomId, userId, guestUsername);
       router.push(`/${roomId}`);
     }
   };
@@ -40,8 +43,8 @@ export default function EnterNamePage() {
         <TextField
           label="Enter Your Name"
           variant="outlined"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={guestUsername}
+          onChange={(e) => setGuestUsername(e.target.value)}
           sx={{ width: 300 }}
         />
         <Button type="submit" variant="contained" color="primary">
