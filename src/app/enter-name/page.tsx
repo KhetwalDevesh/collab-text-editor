@@ -21,7 +21,7 @@ export default function EnterNamePage() {
     if (guestUsername && roomId) {
       // Store the username in sessionStorage or localStorage
       // Redirect to the room page with the roomId
-      console.log("handleSubmit called");
+      console.log("addUser called from guest");
       addUserToRoom(roomId, userId, guestUsername);
       router.push(`/${roomId}`);
     }

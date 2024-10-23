@@ -9,7 +9,7 @@ import Box from "@mui/material/Box";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { setGlobalState, useGlobalState } from "@/store";
-import { createNewRoom } from "./api/room";
+import { addUserToRoom, createNewRoom } from "./api/room";
 
 function useCreateRoom() {
   return useQuery({
@@ -19,7 +19,7 @@ function useCreateRoom() {
 }
 
 export default function Home() {
-  const { userId } = useGlobalState();
+  const { userId, userName } = useGlobalState();
   const [roomId, setRoomId] = useState("");
   const [loggedIn, setLoggedIn] = useState<boolean>(userId ? true : false);
   const router = useRouter();
@@ -29,6 +29,7 @@ export default function Home() {
     if (roomId) {
       // Navigate to the dynamic route based on roomId
       console.log("roomId", JSON.stringify(roomId, null, 2));
+      setGlobalState({ currentRoomId: roomId });
       router.push(`/enter-name?roomId=${roomId}`);
     }
   };
@@ -40,6 +41,10 @@ export default function Home() {
       const response = await createNewRoom(); // Wait for the API response
       console.log("response", JSON.stringify(response, null, 2));
       setGlobalState({ currentRoomId: response.id });
+      if (userName) {
+        console.log("addUser called from host");
+        await addUserToRoom(response.id, userId, userName);
+      }
       router.push(response.id);
     } catch (error) {
       console.error("Error creating new room:", error);

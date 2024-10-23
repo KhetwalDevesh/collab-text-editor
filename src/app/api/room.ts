@@ -14,7 +14,7 @@ export const createNewRoom = async () => {
 export const getRoomDetails = async (roomId: string) => {
   try {
     const resp = await axiosBridged.get(`/room/${roomId}`);
-    console.log("resp", JSON.stringify(resp, null, 2));
+    // console.log("resp", JSON.stringify(resp, null, 2));
     return resp.data;
   } catch (error) {
     console.log("error in getRoomDetails", error);
